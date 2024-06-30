@@ -9,7 +9,9 @@ const getServerHandler: Handler = {
     httpMethod: HttpMethod.GET,
     requireAuth: true,
     execute: async (interaction: Interaction) => {
-        const { userId, serverId } = interaction.req.body;
+        const { serverId } = interaction.req.body;
+
+        const userId = interaction.user?._id;
 
         try {
             if (!userId) {

@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import HttpMethod from "../enum/httpMethod";
 import { PlatformPath } from "path";
+import { IUser } from "../models/user";
 
 export interface IInteraction {
     req: Request;
@@ -13,7 +14,7 @@ export class Interaction implements IInteraction {
     res: Response;
     method: HttpMethod;
     path: PlatformPath;
-    user?: any;
+    user?: IUser;
 
     constructor(req: Request, res: Response, method: HttpMethod, path: PlatformPath) {
         this.req = req;

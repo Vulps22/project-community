@@ -66,7 +66,10 @@ const authCheck = async (interaction: Interaction, next: NextFunction) => {
 
     try {
         const decoded = jwt.verify(token, JWT_SECRET);
-        const user = await User.findById((decoded as any)._id);
+        console.log(decoded);
+        const user = await User.findById((decoded as any).id);
+
+        console.log(user);
 
         if (!user) {
             return res.status(404).json({ message: 'User not found' });

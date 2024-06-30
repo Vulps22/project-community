@@ -9,7 +9,9 @@ const createMessageHandler: Handler = {
     requireAuth: true,
 
     execute: async (interaction: Interaction) => {
-        const { content, channelId, serverId, sender } = interaction.req.body;
+        const { content, channelId, serverId } = interaction.req.body;
+
+        const sender = interaction.user?._id;
 
         if (!content || !channelId || !serverId || !sender) {
             return interaction.res.status(400).json({ message: 'Missing required parameters' });

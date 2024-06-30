@@ -8,7 +8,7 @@ const listServersHandler: Handler = {
     httpMethod: HttpMethod.GET,
     requireAuth: true,
     execute: async (interaction: Interaction) => {
-        const { userId } = interaction.req.body;
+        const userId = interaction.user?._id
 
         try {
             if (!userId) {

@@ -10,7 +10,9 @@ const createServerHandler: Handler = {
     httpMethod: HttpMethod.POST,
     requireAuth: true,
     execute: async (interaction: Interaction) => {
-        const { name, ownerId } = interaction.req.body;
+        const { name } = interaction.req.body;
+
+        const ownerId = interaction.user?._id;
 
         try {
             // Validate ownerId
