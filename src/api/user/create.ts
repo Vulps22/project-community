@@ -6,12 +6,13 @@ import { argon2id, hash } from 'argon2';
 import HttpMethod from '../../enum/httpMethod';
 import Handler from '../../interfaces/handler';
 import User, { IUser } from '../../models/user';
+import { Interaction } from '../../utility/interaction';
 
 const createUserHandler: Handler = {
     httpMethod: HttpMethod.POST,
     requireAuth: false,
-    execute: async (req: Request, res: Response) => {
-        const { username, email, password, avatarUrl, bio } = req.body;
+    execute: async (interaction: Interaction) => {
+        const { username, email, password, avatarUrl, bio } = interaction.req.body;
 
         try {
 
@@ -27,10 +28,10 @@ const createUserHandler: Handler = {
                 }
             });
             const savedUser = await newUser.save();
-            res.json({ message: 'User created successfully', data: savedUser });
+            interaction.res.json({ message: 'User created successfully', data: savedUser });
         } catch (error) {
             console.error('Error creating user:', error);
-            res.status(500).json({ message: 'Error creating user' });
+            interaction.res.status(500).json({ message: 'Error creating user' });
         }
     }
 };

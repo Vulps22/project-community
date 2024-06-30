@@ -6,6 +6,9 @@ import getToken from './config/jwt-token'
 import jwt from 'jsonwebtoken';
 
 import Handler from './src/interfaces/handler'
+import { Interaction } from './src/utility/interaction'
+import HttpMethod from './src/enum/httpMethod';
+import User from './src/models/user';
 
 dotenv.config();
 
@@ -19,8 +22,13 @@ connectDb();
 app.use(express.json());
 
 // Middleware to dynamically load handlers
-app.use((req: Request, res: Response) => {
-    const { method, path: reqPath } = req;
+app.use((req: Request, res: Response) => {    
+    const method = req.method as HttpMethod;
+    const { path: reqPath } = req;
+
+    const interaction: Interaction = new Interaction(req, res, method, path)
+
+
     const handlerPath = `./src/api${reqPath}.ts`;
 
     try {
@@ -28,10 +36,10 @@ app.use((req: Request, res: Response) => {
 
         if (handler.httpMethod === method) {
             if (handler.requireAuth) {
-                authCheck(req, res, () => handler.execute(req, res))
+                authCheck(interaction, () => handler.execute(interaction))
             }
             else {
-                handler.execute(req, res);
+                handler.execute(interaction);
             }
         } else {
             res.status(405).send('Method Not Allowed');
@@ -47,7 +55,8 @@ app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
 });
 
-const authCheck = (req: Request, res: Response, next: () => void) => {
+const authCheck = async (interaction: Interaction, next: NextFunction) => {
+    const { req, res } = interaction;
     const JWT_SECRET = getToken();
     const token = req.header('Authorization')?.replace('Bearer ', '');
 
@@ -57,7 +66,13 @@ const authCheck = (req: Request, res: Response, next: () => void) => {
 
     try {
         const decoded = jwt.verify(token, JWT_SECRET);
-        (req as any).user = decoded;
+        const user = await User.findById((decoded as any)._id);
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        interaction.user = user;
         next();
     } catch (ex) {
         res.status(400).json({ message: 'Invalid Token' })

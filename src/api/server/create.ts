@@ -4,17 +4,18 @@ import Handler from '../../interfaces/handler';
 import Server, { IServer } from '../../models/server';
 import ChannelType from '../../enum/channelType';
 import { IChannel } from '../../models/channel';
+import { Interaction } from '../../utility/interaction';
 
 const createServerHandler: Handler = {
     httpMethod: HttpMethod.POST,
     requireAuth: true,
-    execute: async (req: Request, res: Response) => {
-        const { name, ownerId } = req.body;
+    execute: async (interaction: Interaction) => {
+        const { name, ownerId } = interaction.req.body;
 
         try {
             // Validate ownerId
             if (!ownerId) {
-                return res.status(400).json({ message: 'ownerId is required' });
+                return interaction.res.status(400).json({ message: 'ownerId is required' });
             }
 
             // Create the server instance
@@ -40,10 +41,10 @@ const createServerHandler: Handler = {
             // Save the server to the database
             const savedServer = await newServer.save();
 
-            res.status(201).json(savedServer);
+            interaction.res.status(201).json(savedServer);
         } catch (error) {
             console.error('Error creating server:', error);
-            res.status(500).json({ message: 'Error creating server' });
+            interaction.res.status(500).json({ message: 'Error creating server' });
         }
     }
 };
