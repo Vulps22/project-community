@@ -1,15 +1,17 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose, { Document, Schema, Types } from 'mongoose';
 
 export interface IMessage extends Document {
+  serverId: Types.ObjectId;
   channelId: string;
-  sender: string;
+  sender: Types.ObjectId;
   content: string;
   timestamp: Date;
 }
 
-const MessageSchema: Schema = new Schema({
-  channelId: { type: String, required: true, ref: 'Channel' },
-  sender: { type: String, required: true, ref: 'User' },
+const MessageSchema: Schema<IMessage> = new Schema({
+  serverId: { type: Schema.Types.ObjectId, required: true, ref: 'Server' },
+  channelId: { type: String, required: true },
+  sender: { type: Schema.Types.ObjectId, required: true, ref: 'User' },
   content: { type: String, required: true },
   timestamp: { type: Date, default: Date.now }
 });
