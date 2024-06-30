@@ -3,12 +3,13 @@ import HttpMethod from '../../enum/httpMethod';
 import Handler from '../../interfaces/handler';
 import Message from '../../models/message';
 import { Interaction } from '../../utility/interaction';
+import Server from '../../models/server';
 
 const listMessagesHandler: Handler = {
     httpMethod: HttpMethod.GET,
     requireAuth: true,
     execute: async (interaction: Interaction) => {
-        const { serverId, channelId, page = 1 } = interaction.req.query;
+        const { serverId, channelId, page = 1 } = interaction.req.body;
 
         const limitNumber = 500;
 
@@ -32,7 +33,7 @@ const listMessagesHandler: Handler = {
                 .sort({ timestamp: -1 }) // Sort by timestamp in descending order
                 .skip(skip)
                 .limit(limitNumber)
-                .populate('sender');
+                .populate('sender', ['-passwordHash', '-email']);
 
             interaction.res.status(200).json(messages);
         } catch (error) {
