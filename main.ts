@@ -4,8 +4,12 @@ import connectDb from './config/mongoose'
 import dotenv from 'dotenv'
 import getToken from './config/jwt-token'
 import jwt from 'jsonwebtoken';
+import http from 'http';
+import fs from 'fs';
+import { Server } from 'socket.io';
 
-import Handler from './src/interfaces/handler'
+
+import Handler from './src/handlers/handler'
 import { Interaction } from './src/utility/interaction'
 import HttpMethod from './src/enum/httpMethod';
 import User from './src/models/user';
@@ -21,8 +25,40 @@ connectDb();
 
 app.use(express.json());
 
+const server = http.createServer(app);
+const io = new Server(server, {
+    cors: {
+        origin: "*",  // Be more specific in production!
+        methods: ["GET", "POST"]
+    }
+});
+
+// Dynamic import of event handlers
+const eventHandlers: Array<any> = [];
+const eventsPath = path.join(__dirname, 'src', 'event');
+
+// Read directory and load event handlers
+fs.readdirSync(eventsPath).forEach(file => {
+    if (file.endsWith('.ts')) {
+        console.log("Registering: ", file);
+        const module = require(path.join(eventsPath, file)).default;
+        if (module) {
+            eventHandlers.push(module);
+        }
+    }
+});
+
+
+// Socket.io connection
+io.on('connection', (socket) => {
+    console.log("Connection detected");
+    eventHandlers.forEach(HandlerClass => {
+        new HandlerClass(io, socket); // Instantiate each event handler with the socket
+    });
+});
+
 // Middleware to dynamically load handlers
-app.use((req: Request, res: Response) => {    
+app.use((req: Request, res: Response) => {
     const method = req.method as HttpMethod;
     const { path: reqPath } = req;
 
@@ -51,7 +87,7 @@ app.use((req: Request, res: Response) => {
 });
 
 // Start server
-app.listen(port, () => {
+server.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
 });
 
@@ -66,10 +102,7 @@ const authCheck = async (interaction: Interaction, next: NextFunction) => {
 
     try {
         const decoded = jwt.verify(token, JWT_SECRET);
-        console.log(decoded);
         const user = await User.findById((decoded as any).id);
-
-        console.log(user);
 
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
