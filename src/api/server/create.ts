@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import HttpMethod from '../../enum/httpMethod';
-import Handler from '../../interfaces/handler';
+import Handler from '../../handlers/handler';
 import Server, { IServer } from '../../models/server';
 import ChannelType from '../../enum/channelType';
 import { IChannel } from '../../models/channel';

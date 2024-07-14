@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import HttpMethod from '../../enum/httpMethod';
-import Handler from '../../interfaces/handler';
+import Handler from '../../handlers/handler';
 import Message from '../../models/message';
 import { Interaction } from '../../utility/interaction';
 import Server from '../../models/server';
@@ -9,7 +9,10 @@ const listMessagesHandler: Handler = {
     httpMethod: HttpMethod.GET,
     requireAuth: true,
     execute: async (interaction: Interaction) => {
-        const { serverId, channelId, page = 1 } = interaction.req.body;
+        const serverId = interaction.req.query.serverId as string;
+        const channelId = interaction.req.query.channelId as string;
+        const page = interaction.req.query.page ?? 1 as number;
+
 
         const limitNumber = 500;
 

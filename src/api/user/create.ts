@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { argon2id, hash } from 'argon2';
 import jwt from 'jsonwebtoken';
 import HttpMethod from '../../enum/httpMethod';
-import Handler from '../../interfaces/handler';
+import Handler from '../../handlers/handler';
 import User, { IUser } from '../../models/user';
 import { Interaction } from '../../utility/interaction';
 import getToken from '../../../config/jwt-token';
@@ -13,7 +13,7 @@ const createUserHandler: Handler = {
     httpMethod: HttpMethod.POST,
     requireAuth: false,
     execute: async (interaction: Interaction) => {
-        const { username, email, password, avatarUrl, bio } = interaction.req.body;
+        const { username, email, password, avatarUrl = '', bio = '' } = interaction.req.body;
 
         try {
             // Hash the password
@@ -26,7 +26,7 @@ const createUserHandler: Handler = {
                 passwordHash,
                 profile: {
                     avatarUrl,
-                    bio
+                    bio,
                 }
             });
 

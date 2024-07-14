@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import HttpMethod from '../../enum/httpMethod';
-import Handler from '../../interfaces/handler';
+import Handler from '../../handlers/handler';
 import Server from '../../models/server';
 import User from '../../models/user';
 import { Interaction } from '../../utility/interaction';
@@ -9,7 +9,7 @@ const getServerHandler: Handler = {
     httpMethod: HttpMethod.GET,
     requireAuth: true,
     execute: async (interaction: Interaction) => {
-        const { serverId } = interaction.req.body;
+        const serverId = interaction.req.query.serverId as string;
 
         const userId = interaction.user?._id;
 

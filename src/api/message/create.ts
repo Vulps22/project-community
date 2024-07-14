@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import HttpMethod from "../../enum/httpMethod";
-import Handler from "../../interfaces/handler";
+import Handler from "../../handlers/handler";
 import Message from "../../models/message";
 import { Interaction } from "../../utility/interaction";
 

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import HttpMethod from '../../enum/httpMethod';
-import Handler from '../../interfaces/handler';
+import Handler from '../../handlers/handler';
 import Server from '../../models/server';
 import { Interaction } from '../../utility/interaction';
 
@@ -12,7 +12,7 @@ const listServersHandler: Handler = {
 
         try {
             if (!userId) {
-                return interaction.res.status(400).json({ message: 'userId is required' });
+                return interaction.res.status(400).json({ message: 'Unable to find a user ID for this token.' });
             }
 
             // Query for servers where the user is a member

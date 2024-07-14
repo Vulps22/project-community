@@ -2,7 +2,7 @@
 
 import { Request, Response } from 'express';
 import HttpMethod from '../../enum/httpMethod';
-import Handler from '../../interfaces/handler';
+import Handler from '../../handlers/handler';
 import User from '../../models/user';
 import argon2 from 'argon2';
 import jwt from 'jsonwebtoken';
